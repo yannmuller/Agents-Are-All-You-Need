@@ -1,0 +1,23 @@
+{
+  "name": "agents-are-all-you-need",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "examples/screenshot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "inquirer": "^9.2.20",
+    "openai": "^4.35.0",
+    "play-sound": "^1.1.6",
+    "puppeteer": "^21.11.0",
+    "puppeteer-core": "^22.6.5",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "terminal-kit": "^3.1.1"
+  }
+}
