@@ -1,7 +1,6 @@
 node_modules/
 .env
 package-lock.json
-README.md
 requirements.txt
 *.mp3
 *.jpg
