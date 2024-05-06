@@ -1,6 +1,6 @@
 # Agents Are All You Need
 
-Workshop of work on Autonomous Agents and Multimodal AI.
+Workshop on Autonomous Agents and Multimodal AI.
 ECAL 2024
 
 ## Installation
