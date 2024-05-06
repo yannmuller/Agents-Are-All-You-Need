@@ -3,6 +3,8 @@ node_modules/
 package-lock.json
 README.md
 requirements.txt
-speech.mp3
+*.mp3
+*.jpg
 examples/speech.mp3
+examples/*.jpg
 images/*

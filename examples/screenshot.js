@@ -1,27 +1,20 @@
-import puppeteer from "puppeteer-extra";
-import StealthPlugin from "puppeteer-extra-plugin-stealth";
-puppeteer.use(StealthPlugin());
+import { setPuppeteer, sleep } from "../utils.js";
 
 const url = process.argv[2];
 const timeout = 5000;
 
 (async () => {
-  const browser = await puppeteer.launch({
-    headless: false,
-    executablePath:
-      "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
-    userDataDir:
-      "/Users/matthieu.minguet/Library/Application Support/Google/Chrome Canary/Default",
-  });
-
-  const page = await browser.newPage();
+  const puppeteer = await setPuppeteer();
+  const page = puppeteer.page;
+  const browser = puppeteer.browser;
 
   await page.goto(url, {
     waitUntil: "domcontentloaded",
     timeout: timeout,
   });
 
-  await page.waitForTimeout(timeout);
+  // Attendre 3 secondes
+  await sleep(3000);
 
   await page.screenshot({
     path: "images/screenshot.jpg",

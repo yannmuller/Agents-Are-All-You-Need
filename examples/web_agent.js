@@ -1,5 +1,3 @@
-import puppeteer from "puppeteer-extra";
-import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import OpenAI from "openai";
 import { config } from "dotenv";
 import {
@@ -10,27 +8,17 @@ import {
   waitForEvent,
 } from "../utils.js";
 
-config(); // This replaces require("dotenv/config")
-
-puppeteer.use(StealthPlugin());
+config();
 
 const openai = new OpenAI({
-  apiKey: process.env["OPENAI_API_KEY"], // This is the default and can be omitted
+  apiKey: process.env["OPENAI_API_KEY"],
 });
 
 const timeout = 5000;
 
 (async () => {
-  const browser = await puppeteer.launch({
-    headless: "false",
-    executablePath:
-      "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
-    userDataDir:
-      "/Users/matthieu.minguet/Library/Application Support/Google/Chrome Canary/Default",
-    // headless: false,
-  });
-
-  const page = await browser.newPage();
+  const puppeteer = await setPuppeteer();
+  const page = puppeteer.page;
 
   await page.setViewport({
     width: 1200,

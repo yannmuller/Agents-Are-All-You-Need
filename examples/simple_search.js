@@ -1,5 +1,3 @@
-import puppeteer from "puppeteer-extra";
-import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import OpenAI from "openai";
 import { config } from "dotenv";
 import { image_to_base64, sleep, generate_speech, input } from "../utils.js";
@@ -8,10 +6,8 @@ const { terminal: term } = pkg;
 
 config();
 
-puppeteer.use(StealthPlugin());
-
 const openai = new OpenAI({
-  apiKey: process.env["OPENAI_API_KEY"], // This is the default and can be omitted
+  apiKey: process.env["OPENAI_API_KEY"],
 });
 
 const timeout = 2000;
@@ -19,14 +15,10 @@ const timeout = 2000;
 (async () => {
   console.clear();
 
-  const browser = await puppeteer.launch({
-    headless: false,
-    executablePath:
-      "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
-    userDataDir:
-      "/Users/matthieu.minguet/Library/Application Support/Google/Chrome Canary/Default",
-  });
+  const puppeteer = await setPuppeteer();
+  const page = puppeteer.page;
 
+  // Visual prompt
   const messages = [
     {
       role: "system",
@@ -38,8 +30,6 @@ const timeout = 2000;
       `,
     },
   ];
-
-  const page = await browser.newPage();
 
   while (true) {
     const query = await input("🧑‍💻 What are you searching for :");

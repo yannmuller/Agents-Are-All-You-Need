@@ -1,12 +1,9 @@
-import puppeteer from "puppeteer-extra";
-import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import OpenAI from "openai";
 import { config } from "dotenv";
 import { input, sleep, image_to_base64, generate_speech } from "../utils.js";
 import pkg from "terminal-kit";
 const { terminal: term } = pkg;
 
-puppeteer.use(StealthPlugin());
 config();
 
 const timeout = 3000;
@@ -24,13 +21,8 @@ const openai = new OpenAI({
 
   //const prompt = "Content related to AI only";
 
-  const browser = await puppeteer.launch({
-    headless: false,
-    executablePath:
-      "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
-    userDataDir:
-      "/Users/matthieu.minguet/Library/Application Support/Google/Chrome Canary/Default",
-  });
+  const puppeteer = await setPuppeteer();
+  const page = puppeteer.page;
 
   const messages = [
     {
@@ -46,8 +38,6 @@ const openai = new OpenAI({
       `,
     },
   ];
-
-  const page = await browser.newPage();
 
   await page.goto("https://www.instagram.com/", {
     waitUntil: "domcontentloaded",

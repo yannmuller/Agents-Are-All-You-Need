@@ -2,11 +2,40 @@ import fs from "fs";
 import play from "play-sound";
 import path from "path";
 import inquirer from "inquirer";
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
+puppeteer.use(StealthPlugin());
 
 const player = play({});
 
-export async function generate_speech(text, openai) {
-  const speechFile = path.resolve("./speech.mp3");
+export async function setPuppeteer() {
+  const windowWidth = 960;
+  const windowHeight = 960;
+
+  const browser = await puppeteer.launch({
+    headless: false,
+    defaultViewport: null,
+    executablePath:
+      "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
+    userDataDir:
+      "/Users/matthieu.minguet/Library/Application Support/Google/Chrome Canary/Default",
+    ignoreDefaultArgs: [
+      "--enable-automation",
+      "--disable-blink-features=AutomationControlled",
+    ],
+    args: ["--window-size=" + windowWidth + "," + (windowHeight + 88) + ""],
+    ignoreHTTPSErrors: true,
+  });
+
+  const pages = await browser.pages();
+
+  const page = pages[0];
+
+  return { page: page, browser: browser };
+}
+
+export async function generate_speech(text, openai, filename = "speech.mp3") {
+  const speechFile = path.resolve("./" + filename);
   const mp3 = await openai.audio.speech.create({
     model: "tts-1",
     voice: "onyx",
@@ -57,27 +86,6 @@ export async function input(question) {
 
   return response.answer;
 }
-
-// export async function input(text) {
-//   let the_prompt;
-
-//   const rl = readline.createInterface({
-//     input: process.stdin,
-//     output: process.stdout,
-//   });
-
-//   await (async () => {
-//     return new Promise((resolve) => {
-//       rl.question(text, (prompt) => {
-//         the_prompt = prompt;
-//         rl.close();
-//         resolve();
-//       });
-//     });
-//   })();
-
-//   return the_prompt;
-// }
 
 export async function sleep(milliseconds) {
   return await new Promise((r, _) => {

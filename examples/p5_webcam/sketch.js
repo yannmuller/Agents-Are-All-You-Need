@@ -9,8 +9,27 @@ function setup() {
 }
 
 function draw() {
-  // Draw the video capture within the canvas.
-  image(capture, 0, 0, width, (width * capture.height) / capture.width);
+  background(0);
+
+  // Responsive video capture
+  let videoAspectRatio = capture.width / capture.height;
+  let canvasAspectRatio = width / height;
+
+  let x, y, w, h;
+
+  if (canvasAspectRatio > videoAspectRatio) {
+    w = width;
+    h = w / videoAspectRatio;
+    x = 0;
+    y = (height - h) / 2;
+  } else {
+    h = height;
+    w = h * videoAspectRatio;
+    y = 0;
+    x = (width - w) / 2;
+  }
+
+  image(capture, x, y, w, h);
 }
 
 function windowResized() {
