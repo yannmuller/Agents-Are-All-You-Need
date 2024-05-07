@@ -6,8 +6,10 @@ ECAL 2024
 
 ## Installation
 
+- To install: [Chrome Canary](https://www.google.com/intl/fr/chrome/canary/)
+
 ```bash
-# rename .env.example to .env and replace OPENAI_API_KEY value
+# rename .env.example to .env and replace values
 $ npm install
 ```
 
