@@ -1,12 +1,16 @@
 import fs from "fs";
 import play from "play-sound";
 import path from "path";
+import { config } from "dotenv";
+
 import inquirer from "inquirer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 puppeteer.use(StealthPlugin());
 
 const player = play({});
+
+config();
 
 export async function setPuppeteer() {
   const windowWidth = 960;
@@ -15,11 +19,9 @@ export async function setPuppeteer() {
   const browser = await puppeteer.launch({
     headless: false,
     defaultViewport: null,
-    executablePath:
-      "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
-    userDataDir:
-      "/Users/matoseb/Library/Application Support/Google/Chrome Canary/Default",
-      
+    executablePath: process.env["EXECUTABLE_PATH"],
+    userDataDir: process.env["USER_DATA_DIR"],
+
     ignoreDefaultArgs: [
       "--enable-automation",
       "--disable-blink-features=AutomationControlled",
