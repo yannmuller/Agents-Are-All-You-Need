@@ -7,3 +7,5 @@ requirements.txt
 examples/speech.mp3
 examples/*.jpg
 images/*
+
+.DS_Store
