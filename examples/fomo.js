@@ -26,7 +26,7 @@ const openai = new OpenAI({
     waitUntil: "domcontentloaded",
   });
 
-  await sleep(100000);
+  await sleep(timeout);
   await page.click("._aauk");
   await sleep(timeout);
 
