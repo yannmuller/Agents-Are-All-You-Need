@@ -18,7 +18,8 @@ export async function setPuppeteer() {
     executablePath:
       "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
     userDataDir:
-      "/Users/matthieu.minguet/Library/Application Support/Google/Chrome Canary/Default",
+      "/Users/matoseb/Library/Application Support/Google/Chrome Canary/Default",
+      
     ignoreDefaultArgs: [
       "--enable-automation",
       "--disable-blink-features=AutomationControlled",
