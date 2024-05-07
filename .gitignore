@@ -6,6 +6,6 @@ requirements.txt
 *.jpg
 examples/speech.mp3
 examples/*.jpg
-images/*
+images/*.jpg
 
 .DS_Store
