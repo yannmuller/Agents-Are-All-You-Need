@@ -20,12 +20,13 @@ const openai = new OpenAI({
 
   const puppeteer = await setPuppeteer();
   const page = puppeteer.page;
+  const browser = puppeteer.browser;
 
   await page.goto("https://www.instagram.com/", {
     waitUntil: "domcontentloaded",
   });
 
-  await sleep(timeout);
+  await sleep(100000);
   await page.click("._aauk");
   await sleep(timeout);
 

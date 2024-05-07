@@ -6,6 +6,7 @@ import {
   sleep,
   highlight_links,
   waitForEvent,
+  setPuppeteer,
 } from "../utils.js";
 
 config();
@@ -76,7 +77,7 @@ const timeout = 5000;
       await highlight_links(page);
 
       await page.screenshot({
-        path: "screenshot.jpg",
+        path: "images/screenshot.jpg",
         fullPage: true,
       });
 
@@ -85,14 +86,16 @@ const timeout = 5000;
     }
 
     if (screenshot_taken) {
-      const base64_image = await image_to_base64("screenshot.jpg");
+      const base64_image = await image_to_base64("images/screenshot.jpg");
 
       messages.push({
         role: "user",
         content: [
           {
             type: "image_url",
-            image_url: base64_image,
+            image_url: {
+              url: base64_image,
+            },
           },
           {
             type: "text",
@@ -105,8 +108,9 @@ const timeout = 5000;
     }
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4-vision-preview",
+      model: "gpt-4-turbo",
       max_tokens: 1024,
+      response_format: { type: "json_object" },
       messages: messages,
     });
 
@@ -158,14 +162,18 @@ const timeout = 5000;
         if (partial) console.log("Partial match found: " + link_text);
 
         if (exact || partial) {
-          const [response] = await Promise.all([
-            page
-              .waitForNavigation({ waitUntil: "domcontentloaded" })
-              .catch((e) =>
-                console.log("Navigation timeout/error:", e.message)
-              ),
-            (exact || partial).click(),
-          ]);
+          try {
+            const [response] = await Promise.all([
+              page
+                .waitForNavigation({ waitUntil: "domcontentloaded" })
+                .catch((e) =>
+                  console.log("Navigation timeout/error:", e.message)
+                ),
+              (exact || partial).click(),
+            ]);
+          } catch (error) {
+            console.log("ERROR: Clicking failed", error);
+          }
 
           // Additional checks can be done here, like validating the response or URL
           await Promise.race([waitForEvent(page, "load"), sleep(timeout)]);
@@ -188,7 +196,7 @@ const timeout = 5000;
           await highlight_links(page);
 
           await page.screenshot({
-            path: "image/screenshot.jpg",
+            path: "images/screenshot.jpg",
             quality: 100,
             fullpage: true,
           });

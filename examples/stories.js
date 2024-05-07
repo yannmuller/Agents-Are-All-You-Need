@@ -1,6 +1,12 @@
 import OpenAI from "openai";
 import { config } from "dotenv";
-import { input, sleep, image_to_base64, generate_speech } from "../utils.js";
+import {
+  input,
+  sleep,
+  image_to_base64,
+  generate_speech,
+  setPuppeteer,
+} from "../utils.js";
 import pkg from "terminal-kit";
 const { terminal: term } = pkg;
 

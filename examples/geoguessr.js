@@ -29,7 +29,16 @@ const openai = new OpenAI({
 (async () => {
   console.clear();
 
-  await sleep(5000);
+  term("🌍 ");
+  await term.slowTyping("Searching for a random location " + "\n", {
+    flashStyle: term.brightWhite,
+    delay: 80,
+  });
+
+  await sleep(1000);
+
+  term.reset();
+
   const puppeteer = await setPuppeteer();
   const page = puppeteer.page;
 
@@ -38,7 +47,7 @@ const openai = new OpenAI({
       role: "system",
       content: `You are a geo guesser assistant for google maps street view. You'll have to guess based on screenshots. Be concise in the answer. Do not use UI elements nor texts on the image.
 
-      You will receive multiple screenshots. Integrate in your reasoning some elements of previous answers to maintain continuity in the storytelling. Never include the location guess in the thoughts answer. Thoughs shoud be very short description. You have to point out the main elements and metadatas that could help you find the location.
+      You will receive multiple screenshots. Integrate in your reasoning some elements of previous answers to maintain continuity in the storytelling. Never include the location name in the thoughts. Thoughs shoud be very short descriptions. You have to point out the main elements and metadatas that could help you find the location. Use a personal and creative tone of voice.
       
       Always answer with the following JSON schema. Your priority is to never include trails commas in answer. return only the JSON object and nothing else:
         {
@@ -51,7 +60,8 @@ const openai = new OpenAI({
     },
   ];
 
-  const location = locations[Math.floor(Math.random() * locations.length)];
+  //const location = locations[Math.floor(Math.random() * locations.length)];
+  const location = locations[3];
 
   await page.goto(
     "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=" +
@@ -136,19 +146,25 @@ const openai = new OpenAI({
       const guess = json_answer["guess"];
       const coordinates = json_answer["guess_coordinates"];
 
-      console.log("🤖 Guess: ", guess + "\n" + "coordinates: ", coordinates);
+      console.clear();
 
-      await page.goto(
-        "https://www.google.com/maps/@?api=1&map_action=map&center=" +
-          coordinates[0] + // Latitude
-          "," +
-          coordinates[1] + // Longitude
-          "&zoom=15",
-        {
-          waitUntil: "domcontentloaded",
-          timeout: timeout,
-        }
-      );
+      await term.slowTyping("Probable location :" + coordinates + "\n", {
+        flashStyle: term.brightWhite,
+        delay: 50,
+      }),
+        //console.log("🤖 Guess: ", guess + "\n" + "coordinates: ", coordinates);
+
+        await page.goto(
+          "https://www.google.com/maps/@?api=1&map_action=map&center=" +
+            coordinates[0] + // Latitude
+            "," +
+            coordinates[1] + // Longitude
+            "&zoom=15",
+          {
+            waitUntil: "domcontentloaded",
+            timeout: timeout,
+          }
+        );
 
       await page.evaluate((guess) => {
         let dom = document.querySelector("body");

@@ -7,5 +7,5 @@ requirements.txt
 examples/speech.mp3
 examples/*.jpg
 images/*.jpg
-
+pnpm-lock.yaml
 .DS_Store

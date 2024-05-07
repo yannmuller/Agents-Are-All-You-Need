@@ -31,7 +31,6 @@ export async function setPuppeteer() {
   });
 
   const pages = await browser.pages();
-
   const page = pages[0];
 
   return { page: page, browser: browser };
