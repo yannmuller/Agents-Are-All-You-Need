@@ -6,6 +6,8 @@ import { config } from "dotenv";
 import inquirer from "inquirer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import useActionViz from "./utils.actionviz.js";
+// import KeystrokeVisualizer from  'keystroke-visualizer';
 puppeteer.use(StealthPlugin());
 
 const player = play({});
@@ -32,6 +34,8 @@ export async function setPuppeteer() {
 
   const pages = await browser.pages();
   const page = pages[0];
+
+  await useActionViz(page);
 
   return { page: page, browser: browser };
 }
@@ -130,9 +134,9 @@ export async function highlight_links(page) {
             rect.top >= 0 &&
             rect.left >= 0 &&
             rect.bottom <=
-              (window.innerHeight || document.documentElement.clientHeight) &&
+            (window.innerHeight || document.documentElement.clientHeight) &&
             rect.right <=
-              (window.innerWidth || document.documentElement.clientWidth)
+            (window.innerWidth || document.documentElement.clientWidth)
           );
         }
 
