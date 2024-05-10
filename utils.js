@@ -7,7 +7,7 @@ import inquirer from "inquirer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import useActionViz from "./utils.actionviz.js";
-// import KeystrokeVisualizer from  'keystroke-visualizer';
+
 puppeteer.use(StealthPlugin());
 
 const player = play({});

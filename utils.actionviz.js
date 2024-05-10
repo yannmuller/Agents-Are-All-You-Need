@@ -70,6 +70,7 @@ function init(window) {
             this.style = document.createElement('style');
             this.style.innerHTML = `
       ul.keystrokes {
+        pointer-events: none;
         padding: 10px;
         position: fixed;
         z-index: 999999;
@@ -229,7 +230,7 @@ function init(window) {
           pointer-events: none;
           position: absolute;
           top: 0;
-          z-index: 10000;
+          z-index: 999999;
           left: 0;
           width: 30px;
           height: 30px;
