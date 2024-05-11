@@ -70,21 +70,23 @@ function init(window) {
             this.style = document.createElement('style');
             this.style.innerHTML = `
       ul.keystrokes {
+        all: initial;
         pointer-events: none;
-        padding: 10px;
-        position: fixed;
-        z-index: 999999;
+        padding: 10px !important;
+        position: fixed !important;
+        z-index: 999999 !important;
         ${positions[this.options.position]}
       }
       
       ul.keystrokes li {
-        font-family: Arial;
+        font-family: Arial !important;
         background-color: ${this.options.bezelColor};
         opacity: 0.9;
         color: ${this.options.textColor};
         padding: 5px 10px;
         margin-bottom: 5px;
         border-radius: 10px;
+        box-shadow: 0 0 0 2px ${this.options.textColor};
         opacity: 1;
         font-size: ${this.options.fontSize}px;
         display: table;
@@ -194,17 +196,19 @@ function init(window) {
         styleElement.innerHTML = `
 
         div.clickEffect{
-            pointer-events:none;
-            position:fixed;
-            box-sizing:border-box;
-            border-style:solid;
-            border-color:white;
-            border-radius:50%;
-            animation: clickEffect 0.4s ease;
-            border-width:0.5rem;
-            z-index:99999;
+            all: initial;
+            pointer-events: none !important;
+            position: fixed !important;
+            box-sizing: border-box !important;
+            border-style: solid !important;
+            border-color: white !important;
+            border-radius: 50% !important;
+            animation: ptrclickEffect 0.4s ease !important;
+            border-width: 0.5rem !important;
+            box-shadow: 0 0 0 2px rgba(0,0,0,1) !important;
+            z-index: 99999 !important;
         }
-        @keyframes clickEffect{
+        @keyframes ptrclickEffect{
             0%{
                 opacity:1;
                 width:0.5em; height:0.5em;
@@ -217,7 +221,7 @@ function init(window) {
             }
         }
 
-        @keyframes fadeOut {
+        @keyframes ptrfadeOut {
             0% {
                 opacity: 1;
             }
@@ -227,45 +231,52 @@ function init(window) {
         }
 
         puppeteer-mouse-pointer {
-          pointer-events: none;
-          position: absolute;
+          all: initial;
+          pointer-events: none !important;
+          position: fixed !important;
           top: 0;
-          z-index: 999999;
           left: 0;
-          width: 30px;
-          height: 30px;
-          animation: fadeOut 0.3s ease 3s forwards;
-          background: rgba(0,0,0,.1);
-          border: 2px solid white;
-          border-radius: 100%;
+          z-index: 999999 !important;
+          width: 30px !important;
+          height: 30px !important;
+          animation: ptrfadeOut 0.3s ease 3s forwards;
+          background: rgba(0,0,0,.1) !important;
+          border: 2px solid white !important;
+          box-shadow: 0 0 0 2px rgba(0,0,0,1);
+          border-radius: 100% !important;
           transform: translate(-50%, -50%);
-          padding: 0;
-          transition: background .2s, border-radius .2s, border-color .2s;
+          padding: 0 !important;
+          transition: background .2s, border-radius .2s, border-color .2s !important;
         }
         puppeteer-mouse-pointer.button-1 {
-          transition: none;
-          animation: none;
-          background: rgba(255,255,255,1);
+          box-shadow: inset 0 0 0 2px rgba(0,0,0,1);
+          transition: none !important;
+          animation: none !important;
+          background: rgba(255,255,255,1) !important;
         }
         puppeteer-mouse-pointer.button-2 {
-          transition: none;
-          animation: none;
-          border-color: rgba(0,0,255,1);
+          box-shadow: inset 0 0 0 2px rgba(0,0,0,1);
+          transition: none !important;
+          animation: none !important;
+          border-color: rgba(0,0,255,1) !important;
         }
         puppeteer-mouse-pointer.button-3 {
-          transition: none;
-          animation: none;
-          border-color: rgba(0,255,0,1);
+          box-shadow: inset 0 0 0 2px rgba(0,0,0,1);
+          transition: none !important;
+          animation: none !important;
+          border-color: rgba(0,255,0,1) !important;
         }
         puppeteer-mouse-pointer.button-4 {
-          transition: none;
-          animation: none;
-          border-color: rgba(255,0,0,1);
+          box-shadow: inset 0 0 0 2px rgba(0,0,0,1);
+          transition: none !important;
+          animation: none !important;
+          border-color: rgba(255,0,0,1) !important;
         }
         puppeteer-mouse-pointer.button-5 {
-          transition: none;
-          animation: none;
-          border-color: rgba(0,255,0,1);
+          box-shadow: inset 0 0 0 2px rgba(0,0,0,1);
+          transition: none !important;
+          animation: none !important;
+          border-color: rgba(0,255,0,1) !important;
         }
       `;
         document.head.appendChild(styleElement);
@@ -277,8 +288,8 @@ function init(window) {
             }, 10);
         }
         document.addEventListener('mousemove', event => {
-            box.style.left = event.pageX + 'px';
-            box.style.top = event.pageY + 'px';
+            box.style.left = event.clientX + 'px';
+            box.style.top = event.clientY + 'px';
             box.style.animation = 'none';
             restartAnim();
             updateButtons(event.buttons);
