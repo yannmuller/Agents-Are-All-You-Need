@@ -71,10 +71,13 @@ function init(window) {
             this.style.innerHTML = `
       ul.keystrokes {
         all: initial;
-        pointer-events: none;
+        pointer-events: none !important;
         padding: 10px !important;
         position: fixed !important;
         z-index: 999999 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
         ${positions[this.options.position]}
       }
       
