@@ -2,6 +2,7 @@ import fs from "fs";
 import play from "play-sound";
 import path from "path";
 import { config } from "dotenv";
+import OpenAI from "openai";
 
 import inquirer from "inquirer";
 import puppeteer from "puppeteer-extra";
@@ -11,6 +12,10 @@ puppeteer.use(StealthPlugin());
 const player = play({});
 
 config();
+
+export const openai = new OpenAI({
+  apiKey: process.env["OPENAI_API_KEY"],
+});
 
 export async function setPuppeteer() {
   const windowWidth = 960;
@@ -89,12 +94,16 @@ export async function input(question) {
   return response.answer;
 }
 
-export async function sleep(milliseconds) {
-  return await new Promise((r, _) => {
-    setTimeout(() => {
-      r();
-    }, milliseconds);
-  });
+// export async function sleep(ms) {
+//   return await new Promise((resolve) => {
+//     setTimeout(() => {
+//       resolve();
+//     }, ms);
+//   });
+// }
+
+export async function sleep(ms) {
+  return await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export async function highlight_links(page) {

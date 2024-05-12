@@ -2,15 +2,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import play from "play-sound";
-import OpenAI from "openai";
-import { config } from "dotenv";
-import { image_to_base64, sleep, setPuppeteer } from "../../utils.js";
-
-config();
-
-const openai = new OpenAI({
-  apiKey: process.env["OPENAI_API_KEY"],
-});
+import { image_to_base64, sleep, setPuppeteer, openai } from "../../utils.js";
 
 const timeout = 2000;
 
@@ -31,8 +23,7 @@ let message_text = "";
 (async () => {
   console.clear();
 
-  const puppeteer = await setPuppeteer();
-  const page = puppeteer.page;
+  const { page } = await setPuppeteer();
 
   // Visual prompt
   const messages = [
@@ -90,8 +81,16 @@ let message_text = "";
 
     const message = response.choices[0].message;
     message_text = message.content;
+
+    // On garde le contexte des réponses
+    messages.push({
+      role: "assistant",
+      content: message_text,
+    });
+
     // console.log("🤖 ", message_text);
 
+    // Ne pas attendre la fin de la lecture pour générer le prochain texte
     if (initialPlay == false) {
       generateAndPlayAudio();
       initialPlay = true;

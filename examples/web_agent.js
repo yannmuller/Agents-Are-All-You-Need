@@ -1,5 +1,3 @@
-import OpenAI from "openai";
-import { config } from "dotenv";
 import {
   image_to_base64,
   input,
@@ -7,25 +5,13 @@ import {
   highlight_links,
   waitForEvent,
   setPuppeteer,
+  openai,
 } from "../utils.js";
-
-config();
-
-const openai = new OpenAI({
-  apiKey: process.env["OPENAI_API_KEY"],
-});
 
 const timeout = 5000;
 
 (async () => {
-  const puppeteer = await setPuppeteer();
-  const page = puppeteer.page;
-
-  await page.setViewport({
-    width: 1200,
-    height: 1200,
-    deviceScaleFactor: 1,
-  });
+  const { page } = await setPuppeteer();
 
   const messages = [
     {

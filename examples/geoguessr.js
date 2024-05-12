@@ -1,15 +1,12 @@
-import OpenAI from "openai";
-import { config } from "dotenv";
 import {
   image_to_base64,
   sleep,
   generate_speech,
   setPuppeteer,
+  openai,
 } from "../utils.js";
 import pkg from "terminal-kit";
 const { terminal: term } = pkg;
-
-config();
 
 const timeout = 2000;
 const steps = 3;
@@ -22,36 +19,31 @@ const locations = [
   ["23.0325402", "31.4215355", "61.89"],
 ];
 
-const openai = new OpenAI({
-  apiKey: process.env["OPENAI_API_KEY"],
-});
-
 (async () => {
   console.clear();
 
   term("🌍 ");
   await term.slowTyping("Searching for a random location " + "\n", {
     flashStyle: term.brightWhite,
-    delay: 80,
+    delay: 40,
   });
 
   await sleep(1000);
 
   term.reset();
 
-  const puppeteer = await setPuppeteer();
-  const page = puppeteer.page;
+  const { page } = await setPuppeteer();
 
   const messages = [
     {
       role: "system",
       content: `You are a geo guesser assistant for google maps street view. You'll have to guess based on screenshots. Be concise in the answer. Do not use UI elements nor texts on the image.
 
-      You will receive multiple screenshots. Integrate in your reasoning some elements of previous answers to maintain continuity in the storytelling. Never include the location name in the thoughts. Thoughs shoud be very short descriptions. You have to point out the main elements and metadatas that could help you find the location. Use a personal and creative tone of voice.
+      You will receive multiple screenshots. Integrate in your reasoning some elements of previous answers to maintain continuity in the storytelling. Never include the location name in the thoughts. Thoughs shoud be very short descriptions of metadatas. You have to point out the main elements that could help you find the location. Use a personal and creative tone of voice.
       
       Always answer with the following JSON schema. Your priority is to never include trails commas in answer. return only the JSON object and nothing else:
         {
-          "thought": "I can see in this place lots of interesting metadatas",
+          "thought": "I can see in this place lots of interesting metadatas: The architecture is European and there is a lake view.",
           "metadatas": ["European architecture", "Lake view"],
           "guess": "🇨🇭 Lausanne, Switzerland",
           "guess_coordinates": ["46.5221392", "6.6330123"]
@@ -60,8 +52,8 @@ const openai = new OpenAI({
     },
   ];
 
-  //const location = locations[Math.floor(Math.random() * locations.length)];
-  const location = locations[3];
+  const location = locations[Math.floor(Math.random() * locations.length)];
+  //const location = locations[3];
 
   await page.goto(
     "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=" +
@@ -133,7 +125,7 @@ const openai = new OpenAI({
     await Promise.all([
       term.slowTyping(thought + "\n", {
         flashStyle: term.brightWhite,
-        delay: 50,
+        delay: 40,
       }),
       generate_speech(thought, openai),
     ]);
@@ -150,7 +142,7 @@ const openai = new OpenAI({
 
       await term.slowTyping("Probable location :" + coordinates + "\n", {
         flashStyle: term.brightWhite,
-        delay: 50,
+        delay: 40,
       }),
         //console.log("🤖 Guess: ", guess + "\n" + "coordinates: ", coordinates);
 

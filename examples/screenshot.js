@@ -21,5 +21,7 @@ const timeout = 5000;
     fullPage: true,
   });
 
+  console.log("Screenshot saved in images/screenshot.jpg");
+
   await browser.close();
 })();

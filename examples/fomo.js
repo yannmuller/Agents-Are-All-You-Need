@@ -1,26 +1,16 @@
-import OpenAI from "openai";
-import { config } from "dotenv";
-import { sleep, image_to_base64, setPuppeteer } from "../utils.js";
+import { sleep, image_to_base64, setPuppeteer, openai } from "../utils.js";
 import pkg from "terminal-kit";
 const { terminal: term } = pkg;
 
-config();
-
 const timeout = 3000;
 const steps = 3;
-
-const openai = new OpenAI({
-  apiKey: process.env["OPENAI_API_KEY"],
-});
 
 (async () => {
   term.reset();
   const spinner = await term.spinner();
   term(" Processing... ");
 
-  const puppeteer = await setPuppeteer();
-  const page = puppeteer.page;
-  const browser = puppeteer.browser;
+  const { page, browser } = await setPuppeteer();
 
   await page.goto("https://www.instagram.com/", {
     waitUntil: "domcontentloaded",
@@ -48,6 +38,7 @@ const openai = new OpenAI({
       content: `You are an instagram recapper. 
       I'll send you multiples screenshots of stories. Please send by a very brief description of everything i missed. Just one sentence. Use a sarcastic tone. Start withh something like "What you did not missed today:"
        just recap all items in one small sentence. not as a list. skip the ads in this recap.
+       You can add emoji before each item to make it more fun.
        
        In a second time estimate the time saved by not watching the stories and suggest a real life activity. "
        `,
@@ -86,8 +77,5 @@ const openai = new OpenAI({
   spinner.animate(false);
   term.reset();
 
-  await term.slowTyping(message_text + "\n", {
-    flashStyle: term.brightWhite,
-    delay: 50,
-  });
+  console.log(message_text);
 })();

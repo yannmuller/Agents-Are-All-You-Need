@@ -9,3 +9,5 @@ examples/*.jpg
 images/*.jpg
 pnpm-lock.yaml
 .DS_Store
+examples/scraper_basic.js
+examples/scraper_advanced.js

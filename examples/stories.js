@@ -1,22 +1,15 @@
-import OpenAI from "openai";
-import { config } from "dotenv";
 import {
   input,
   sleep,
   image_to_base64,
   generate_speech,
   setPuppeteer,
+  openai,
 } from "../utils.js";
 import pkg from "terminal-kit";
 const { terminal: term } = pkg;
 
-config();
-
 const timeout = 3000;
-
-const openai = new OpenAI({
-  apiKey: process.env["OPENAI_API_KEY"],
-});
 
 (async () => {
   console.clear();
@@ -27,8 +20,7 @@ const openai = new OpenAI({
 
   //const prompt = "Content related to AI only";
 
-  const puppeteer = await setPuppeteer();
-  const page = puppeteer.page;
+  const { page } = await setPuppeteer();
 
   const messages = [
     {
