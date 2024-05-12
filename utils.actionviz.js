@@ -189,12 +189,57 @@ function init(window) {
     }
 
     const KEYVIS = new KeystrokeVisualizer();
+    const box = document.createElement('puppeteer-mouse-pointer');
+
+    // click effect
+    HTMLElement.prototype._originalClick = HTMLElement.prototype.click;
+    // Monkey patch the click function
+    HTMLElement.prototype.click = function () {
+        const el = closestVisible(this);
+        const bb = el.getBoundingClientRect();
+        const event = {
+            clientX: bb.left + bb.width / 2,
+            clientY: bb.top + bb.height / 2
+        }
+        clickEffect(event);
+        moveBox(event);
+        this._originalClick.apply(this, arguments);
+    };
+
+    function closestVisible(element) {
+        if (!element.checkVisibility) return element;
+        if (element.checkVisibility()) return element;
+        return closestVisible(element.parentElement);
+    }
+
+    function restartAnim() {
+        clearTimeout(window.animT);
+        window.animT = setTimeout(() => {
+            box.style.removeProperty('animation');
+        }, 10);
+    }
+
+    function moveBox(event) {
+        box.style.left = event.clientX + 'px';
+        box.style.top = event.clientY + 'px';
+        box.style.animation = 'none';
+        restartAnim();
+    }
+
+    function clickEffect(e) {
+        var d = document.createElement("div");
+        d.className = "clickEffect";
+        d.style.top = e.clientY + "px"; d.style.left = e.clientX + "px";
+        document.body.appendChild(d);
+        d.addEventListener('animationend', function () { d.parentElement.removeChild(d); }.bind(this));
+    }
 
     window.addEventListener('DOMContentLoaded', () => {
 
+
         KEYVIS.enable(DEFAULT_OPTIONS);
 
-        const box = document.createElement('puppeteer-mouse-pointer');
+
         const styleElement = document.createElement('style');
         styleElement.innerHTML = `
 
@@ -284,17 +329,9 @@ function init(window) {
       `;
         document.head.appendChild(styleElement);
         document.body.appendChild(box);
-        function restartAnim() {
-            clearTimeout(window.animT);
-            window.animT = setTimeout(() => {
-                box.style.removeProperty('animation');
-            }, 10);
-        }
+
         document.addEventListener('mousemove', event => {
-            box.style.left = event.clientX + 'px';
-            box.style.top = event.clientY + 'px';
-            box.style.animation = 'none';
-            restartAnim();
+            moveBox(event)
             updateButtons(event.buttons);
         }, true);
         document.addEventListener('mousedown', event => {
@@ -309,14 +346,6 @@ function init(window) {
         function updateButtons(buttons) {
             for (let i = 0; i < 5; i++)
                 box.classList.toggle('button-' + i, buttons & (1 << i));
-        }
-
-        function clickEffect(e) {
-            var d = document.createElement("div");
-            d.className = "clickEffect";
-            d.style.top = e.clientY + "px"; d.style.left = e.clientX + "px";
-            document.body.appendChild(d);
-            d.addEventListener('animationend', function () { d.parentElement.removeChild(d); }.bind(this));
         }
 
     }, true);
