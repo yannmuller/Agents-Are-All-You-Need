@@ -34,7 +34,7 @@ def on_release(key):
                 dataurl = f"data:image/jpg;base64,{jpg_as_text}"
 
                 response = model.chat.completions.create(
-                    model="gpt-4-turbo",
+                    model="gpt-4o",
                     messages=[
                         {
                             "role": "system",

@@ -74,7 +74,7 @@ const timeout = 3000;
     });
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4-turbo",
+      model: "gpt-4o",
       max_tokens: 1024,
       response_format: { type: "json_object" },
       messages: messages,
