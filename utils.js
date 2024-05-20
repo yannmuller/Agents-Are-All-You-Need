@@ -19,9 +19,13 @@ export const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
 });
 
-export async function setPuppeteer() {
-  const windowWidth = 960;
-  const windowHeight = 960;
+export async function setPuppeteer(options = {}) {
+  const {
+    windowWidth = 960,
+    windowHeight = 960,
+    args = [],
+    puppeteerOptions = {},
+  } = options;
 
   const browser = await puppeteer.launch({
     headless: false,
@@ -33,23 +37,78 @@ export async function setPuppeteer() {
       "--enable-automation",
       "--disable-blink-features=AutomationControlled",
     ],
-    args: ["--window-size=" + windowWidth + "," + (windowHeight + 88) + ""],
+    args: [
+      "--window-size=" + windowWidth + "," + (windowHeight + 88) + "",
+      ...args,
+    ],
     ignoreHTTPSErrors: true,
+    ...puppeteerOptions,
   });
 
   const pages = await browser.pages();
   const page = pages[0];
+  await page.setBypassCSP(true); // bypass Content Security Policy
+  //await useActionViz(page);
 
-  await useActionViz(page);
-
-  return { page: page, browser: browser };
+  return { page, browser };
 }
 
-export async function generate_speech(text, openai, filename = "speech.mp3") {
+export async function newWindow(browser, options) {
+  const client = await browser.target().createCDPSession();
+  const { targetId } = await client.send("Target.createTarget", {
+    url: "about:blank",
+    newWindow: true,
+    background: false,
+    ...options,
+  });
+  const target = await browser.waitForTarget(
+    (target) => target._targetId === targetId
+  );
+  const page = await target.page();
+
+  const setBounds = async (bounds) => {
+    const { windowId } = await client.send("Browser.getWindowForTarget", {
+      targetId,
+    });
+    client.send("Browser.setWindowBounds", {
+      windowId,
+      bounds: { windowState: "normal", ...bounds },
+    });
+  };
+
+  await page.setBypassCSP(true); // bypass Content Security Policy
+
+  return { page, client, setBounds };
+}
+
+export /*async*/ function animate(fn, { fps = 60, customData = {} } = {}) {
+  return new Promise((resolve) => {
+    const start = Date.now();
+    let frame;
+    let frameCount = 0;
+    let interval = 1000 / fps;
+
+    const update = async () => {
+      const time = Date.now() - start;
+      const playing = await fn({ time, frameCount, customData });
+      frameCount++;
+      if (playing) return setTimeout(update, interval);
+      resolve();
+    };
+
+    update();
+  });
+}
+
+export async function generate_speech(
+  text,
+  voice = "onyx",
+  filename = "speech.mp3"
+) {
   const speechFile = path.resolve("./" + filename);
   const mp3 = await openai.audio.speech.create({
     model: "tts-1",
-    voice: "onyx",
+    voice: voice,
     input: text,
   });
   const buffer = Buffer.from(await mp3.arrayBuffer());
@@ -58,9 +117,9 @@ export async function generate_speech(text, openai, filename = "speech.mp3") {
   await playAudio();
 }
 
-function playAudio() {
+export function playAudio(file = "speech.mp3") {
   return new Promise((resolve, reject) => {
-    player.play("speech.mp3", function (err) {
+    player.play(file, function (err) {
       if (err) {
         //console.error("Error during audio playback:", err);
         reject(err);
@@ -110,6 +169,64 @@ export async function sleep(ms) {
   return await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+export async function findClosestElement(
+  page,
+  {
+    multiple = false,
+    cssSelector = "*",
+    containText = "",
+    ignoreInvisible = true,
+    exactMatch = false,
+  }
+) {
+  if (!exactMatch) containText = containText.toLowerCase().trim();
+
+  const elems = await page.$$(cssSelector);
+
+  function getElem(e, { containText, ignoreInvisible, exactMatch }) {
+    let text = e.outerHTML;
+
+    if (!exactMatch) text = text.toLowerCase();
+
+    if (ignoreInvisible && !e.checkVisibility()) return;
+    if (!text.includes(containText)) return;
+
+    let deepness = 0;
+    let parent = e.parentElement;
+    while (parent) {
+      deepness++;
+      parent = parent.parentElement;
+    }
+
+    return { domDeepness: deepness, text };
+  }
+
+  let match = elems.map(async (e) => {
+    const res = await e.evaluate(getElem, {
+      containText,
+      ignoreInvisible,
+      exactMatch,
+    });
+
+    if (!res) return;
+
+    return { domDeepness: res.domDeepness, elem: e };
+  });
+
+  match = await Promise.all(match);
+  match = match.filter(Boolean);
+  match = match.sort((a, b) => b.domDeepness - a.domDeepness);
+  match = match.map((m) => m.elem);
+
+  if (multiple) return match;
+
+  match[0].evaluate((e) => {
+    console.log(e);
+  });
+
+  return match[0];
+}
+
 export async function highlight_links(page) {
   await page.evaluate(() => {
     document.querySelectorAll("[gpt-link-text]").forEach((e) => {
@@ -143,9 +260,9 @@ export async function highlight_links(page) {
             rect.top >= 0 &&
             rect.left >= 0 &&
             rect.bottom <=
-            (window.innerHeight || document.documentElement.clientHeight) &&
+              (window.innerHeight || document.documentElement.clientHeight) &&
             rect.right <=
-            (window.innerWidth || document.documentElement.clientWidth)
+              (window.innerWidth || document.documentElement.clientWidth)
           );
         }
 
@@ -193,4 +310,31 @@ export async function waitForEvent(page, event) {
       });
     });
   }, event);
+}
+
+function lerp(start, stop, amount) {
+  return amount * (stop - start) + start;
+}
+
+export async function zoomTo(page, targetZoom, { duration = 1 } = {}) {
+  const framesDuration = 60 * duration;
+
+  const currentZoom = await page.evaluate(() => {
+    return parseFloat(document.body.style.zoom) || 100;
+  });
+
+  if (duration > 0)
+    await animate(async ({ time, frameCount }) => {
+      const zoom = lerp(currentZoom, targetZoom, frameCount / framesDuration);
+
+      page.evaluate((zoom) => {
+        document.body.style.zoom = zoom + "%";
+      }, zoom);
+
+      if (frameCount < framesDuration) return true;
+    });
+
+  await page.evaluate((zoom) => {
+    document.body.style.zoom = zoom + "%";
+  }, targetZoom);
 }

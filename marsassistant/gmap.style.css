@@ -1,0 +1,47 @@
+.tileContainer {
+}
+
+.screenshot {
+  z-index: 100000 !important;
+}
+
+#custom-overlay {
+  background-image: url("http://localhost:9000/marsassistant/assets/overlay.png");
+  background-repeat: no-repeat;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1000000;
+  background-position: center;
+  background-size: auto; /* ou 'cover' selon vos besoins */
+}
+
+.tileContainer--selected {
+  z-index: 1000000;
+}
+
+.tileContainer::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1s;
+  inset: 0;
+  border: 5px solid rgba(255, 247, 0, 1);
+  z-index: 1000000;
+  
+  animation: borderOpacity .5s infinite alternate;
+}
+
+.tileContainer--selected::after {
+  opacity: 1;
+}
+
+@keyframes borderOpacity {
+  0% {
+    border-color: rgba(255, 247, 0, 0.1);
+  }
+  100% {
+    border-color: rgba(255, 247, 0, 1);
+  }
+}
