@@ -7,6 +7,7 @@ requirements.txt
 examples/speech.mp3
 examples/*.jpg
 images/*.jpg
+images/*.png
 pnpm-lock.yaml
 .DS_Store
 examples/scraper_basic.js

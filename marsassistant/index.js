@@ -96,7 +96,7 @@ const messages = [
   chrome_page.close();
 
   const { page: page, setBounds } = await newWindow(browser);
-  await setBounds({ left: 0, top: 0, width: 960, height: 1080 });
+  await setBounds({ left: 0, top: 0, width: 860, height: 1080 });
 
   const app = express();
   const port = 9000; // change in gmap.style.css too
